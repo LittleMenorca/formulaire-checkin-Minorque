@@ -67,6 +67,7 @@
             width: 100%;
             height: 150px;
             background-color: #e0e0e0;
+            touch-action: none;
         }
         .notice {
             font-size: 12px;
@@ -74,29 +75,12 @@
             margin-top: 15px;
         }
     </style>
-    <script>
-        function setLanguage() {
-            let userLang = navigator.language || navigator.userLanguage;
-            document.documentElement.lang = userLang;
-        }
-        function validateEmail() {
-            let emailInput = document.getElementById('email');
-            let emailValue = emailInput.value;
-            let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(emailValue)) {
-                alert("Veuillez entrer une adresse email valide.");
-                emailInput.focus();
-                return false;
-            }
-            return true;
-        }
-    </script>
 </head>
-<body onload="setLanguage()">
+<body>
     <div class="container">
         <h2>Bienvenue à la maison</h2>
         <p>Merci de compléter ce formulaire pour confirmer votre check-in.</p>
-        <form onsubmit="return validateEmail()">
+        <form>
             <label for="nom">Nom complet :</label>
             <input type="text" id="nom" name="nom" required>
 
@@ -138,24 +122,55 @@
         let canvas = document.getElementById('signature-pad');
         let ctx = canvas.getContext('2d');
         let drawing = false;
-
+        
+        function getPosition(event) {
+            let rect = canvas.getBoundingClientRect();
+            return {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top
+            };
+        }
+        
         canvas.addEventListener('mousedown', function(e) {
             drawing = true;
+            let pos = getPosition(e);
             ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
+            ctx.moveTo(pos.x, pos.y);
         });
-
+        
         canvas.addEventListener('mousemove', function(e) {
-            if (drawing) {
-                ctx.lineTo(e.offsetX, e.offsetY);
-                ctx.stroke();
-            }
+            if (!drawing) return;
+            let pos = getPosition(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
         });
-
+        
         canvas.addEventListener('mouseup', function() {
             drawing = false;
         });
-
+        
+        canvas.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            drawing = true;
+            let touch = e.touches[0];
+            let rect = canvas.getBoundingClientRect();
+            ctx.beginPath();
+            ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+        });
+        
+        canvas.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            if (!drawing) return;
+            let touch = e.touches[0];
+            let rect = canvas.getBoundingClientRect();
+            ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            ctx.stroke();
+        });
+        
+        canvas.addEventListener('touchend', function() {
+            drawing = false;
+        });
+        
         function clearSignature() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
