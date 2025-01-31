@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienvenue à la maison</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -91,7 +92,6 @@
 
             <label for="email">Email :</label>
             <input type="email" id="email" name="email" required>
-            <span id="email-error" style="color: red; font-size: 12px; display: none;">Veuillez entrer une adresse email valide.</span>
             
             <label for="nombre_occupants">Nombre d'occupants :</label>
             <input type="number" id="nombre_occupants" name="nombre_occupants" min="1" required>
@@ -121,53 +121,36 @@
                 <button type="submit" class="submit-button">Soumettre</button>
             </div>
         </form>
-        <p class="notice">Vous disposez d'un délai max de 24h pour nous faire remonter tout dysfonctionnement à la maison. Nous agirons dans les plus brefs délais. Passé ce délai, nous considérons que la maison est conforme à vos attentes.</p>
     </div>
     
-    <div class="container hidden" id="thank-you-message">
-        <h2>Merci pour votre validation</h2>
-        <p>Nous vous remercions pour cette validation et nous vous souhaitons de passer d'excellentes vacances. Nous restons à votre disposition sur WhatsApp pour tous besoins.</p>
-    </div>
-
     <script>
-        document.getElementById('checkin-form').addEventListener('submit', async function(event) {
+        document.getElementById('checkin-form').addEventListener('submit', function(event) {
             event.preventDefault();
-            let emailField = document.getElementById('email');
-            let emailError = document.getElementById('email-error');
-            let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            generatePDF();
+        });
+
+        function generatePDF() {
+            const {{ jsPDF }} = window.jspdf;
+            let doc = new jsPDF();
+            doc.text("Confirmation de Check-in", 10, 10);
+            doc.text("Nom: " + document.getElementById('nom').value, 10, 20);
+            doc.text("Email: " + document.getElementById('email').value, 10, 30);
+            doc.text("Nombre d'occupants: " + document.getElementById('nombre_occupants').value, 10, 40);
+            doc.text("Date d’entrée: " + document.getElementById('date_entree').value, 10, 50);
+            doc.text("Date de départ: " + document.getElementById('date_depart').value, 10, 60);
+            doc.text("Commentaire: " + document.getElementById('commentaire').value, 10, 70);
+            doc.text("Date de signature: " + document.getElementById('date_signature').value, 10, 80);
             
-            if (!emailPattern.test(emailField.value)) {
-                emailError.style.display = 'block';
-                return;
-            } else {
-                emailError.style.display = 'none';
-            }
+            let canvas = document.getElementById('signature-pad');
+            let imgData = canvas.toDataURL("image/png");
+            doc.addImage(imgData, 'PNG', 10, 90, 50, 20);
             
-            document.getElementById('form-container').style.display = 'none';
-            document.getElementById('thank-you-message').style.display = 'block';
-        });
-
-        let canvas = document.getElementById('signature-pad');
-        let ctx = canvas.getContext('2d');
-        let drawing = false;
-
-        canvas.addEventListener('pointerdown', (e) => {
-            drawing = true;
-            ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
-        });
-
-        canvas.addEventListener('pointermove', (e) => {
-            if (!drawing) return;
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.stroke();
-        });
-
-        canvas.addEventListener('pointerup', () => {
-            drawing = false;
-        });
+            doc.save("confirmation_checkin.pdf");
+        }
 
         function clearSignature() {
+            let canvas = document.getElementById('signature-pad');
+            let ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     </script>
