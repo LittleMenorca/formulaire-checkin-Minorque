@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienvenue à la maison</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+        (function(){
+            emailjs.init("VOTRE_USER_ID"); // Remplacez par votre User ID EmailJS
+        })();
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -49,9 +55,6 @@
             cursor: pointer;
             width: 48%;
         }
-        .clear-button:hover {
-            background-color: #c82333;
-        }
         .submit-button {
             background-color: #28a745;
             color: white;
@@ -61,9 +64,6 @@
             cursor: pointer;
             width: 48%;
         }
-        .submit-button:hover {
-            background-color: #218838;
-        }
         canvas {
             border: 1px solid #bbb;
             width: 100%;
@@ -71,14 +71,6 @@
             background-color: #e0e0e0;
             touch-action: none;
             display: block;
-        }
-        .notice {
-            font-size: 12px;
-            color: #666;
-            margin-top: 15px;
-        }
-        .hidden {
-            display: none;
         }
     </style>
 </head>
@@ -89,31 +81,12 @@
         <form id="checkin-form">
             <label for="nom">Nom complet :</label>
             <input type="text" id="nom" name="nom" required>
-
             <label for="email">Email :</label>
             <input type="email" id="email" name="email" required>
-            
-            <label for="nombre_occupants">Nombre d'occupants :</label>
-            <input type="number" id="nombre_occupants" name="nombre_occupants" min="1" required>
-
             <label for="date_entree">Date d’entrée :</label>
             <input type="date" id="date_entree" name="date_entree" required>
-            <script>
-                document.getElementById('date_entree').valueAsDate = new Date();
-            </script>
-
             <label for="date_depart">Date de départ :</label>
             <input type="date" id="date_depart" name="date_depart" required>
-
-            <label for="commentaire">Commentaire :</label>
-            <textarea id="commentaire" name="commentaire"></textarea>
-
-            <label for="date_signature">Date de signature :</label>
-            <input type="date" id="date_signature" name="date_signature" readonly>
-            <script>
-                document.getElementById('date_signature').valueAsDate = new Date();
-            </script>
-
             <label>Signature :</label>
             <canvas id="signature-pad"></canvas>
             <div class="button-container">
@@ -122,32 +95,41 @@
             </div>
         </form>
     </div>
-    
     <script>
         document.getElementById('checkin-form').addEventListener('submit', function(event) {
             event.preventDefault();
             generatePDF();
         });
-
+        
         function generatePDF() {
-            const {{ jsPDF }} = window.jspdf;
+            const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
             doc.text("Confirmation de Check-in", 10, 10);
             doc.text("Nom: " + document.getElementById('nom').value, 10, 20);
             doc.text("Email: " + document.getElementById('email').value, 10, 30);
-            doc.text("Nombre d'occupants: " + document.getElementById('nombre_occupants').value, 10, 40);
-            doc.text("Date d’entrée: " + document.getElementById('date_entree').value, 10, 50);
-            doc.text("Date de départ: " + document.getElementById('date_depart').value, 10, 60);
-            doc.text("Commentaire: " + document.getElementById('commentaire').value, 10, 70);
-            doc.text("Date de signature: " + document.getElementById('date_signature').value, 10, 80);
-            
+            doc.text("Date d’entrée: " + document.getElementById('date_entree').value, 10, 40);
+            doc.text("Date de départ: " + document.getElementById('date_depart').value, 10, 50);
             let canvas = document.getElementById('signature-pad');
             let imgData = canvas.toDataURL("image/png");
-            doc.addImage(imgData, 'PNG', 10, 90, 50, 20);
-            
-            doc.save("confirmation_checkin.pdf");
+            doc.addImage(imgData, 'PNG', 10, 60, 50, 20);
+            let pdfData = doc.output("datauristring");
+            sendEmail(pdfData);
         }
-
+        
+        function sendEmail(pdfData) {
+            emailjs.send("VOTRE_SERVICE_ID", "VOTRE_TEMPLATE_ID", {
+                nom: document.getElementById('nom').value,
+                email: document.getElementById('email').value,
+                date_entree: document.getElementById('date_entree').value,
+                date_depart: document.getElementById('date_depart').value,
+                pdf_attachment: pdfData
+            }).then(function(response) {
+                alert("Email envoyé avec succès!");
+            }, function(error) {
+                alert("Erreur lors de l'envoi: " + error.text);
+            });
+        }
+        
         function clearSignature() {
             let canvas = document.getElementById('signature-pad');
             let ctx = canvas.getContext('2d');
