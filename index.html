@@ -130,27 +130,44 @@
     </div>
 
     <script>
-        document.getElementById('checkin-form').addEventListener('submit', function(event) {
+        document.getElementById('checkin-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
             let emailField = document.getElementById('email');
             let emailError = document.getElementById('email-error');
             let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
             
             if (!emailPattern.test(emailField.value)) {
                 emailError.style.display = 'block';
-                event.preventDefault();
                 return;
             } else {
                 emailError.style.display = 'none';
             }
             
-            event.preventDefault();
             document.getElementById('form-container').style.display = 'none';
             document.getElementById('thank-you-message').style.display = 'block';
         });
 
+        let canvas = document.getElementById('signature-pad');
+        let ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        canvas.addEventListener('pointerdown', (e) => {
+            drawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            if (!drawing) return;
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        });
+
+        canvas.addEventListener('pointerup', () => {
+            drawing = false;
+        });
+
         function clearSignature() {
-            let canvas = document.getElementById('signature-pad');
-            let ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     </script>
