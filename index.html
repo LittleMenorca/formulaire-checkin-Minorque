@@ -83,10 +83,22 @@
             <input type="text" id="nom" name="nom" required>
             <label for="email">Email :</label>
             <input type="email" id="email" name="email" required>
+            <label for="nombre_occupants">Nombre d'occupants :</label>
+            <input type="number" id="nombre_occupants" name="nombre_occupants" min="1" required>
             <label for="date_entree">Date d’entrée :</label>
             <input type="date" id="date_entree" name="date_entree" required>
+            <script>
+                document.getElementById('date_entree').valueAsDate = new Date();
+            </script>
             <label for="date_depart">Date de départ :</label>
             <input type="date" id="date_depart" name="date_depart" required>
+            <label for="commentaire">Commentaire :</label>
+            <textarea id="commentaire" name="commentaire"></textarea>
+            <label for="date_signature">Date de signature :</label>
+            <input type="date" id="date_signature" name="date_signature" readonly>
+            <script>
+                document.getElementById('date_signature').valueAsDate = new Date();
+            </script>
             <label>Signature :</label>
             <canvas id="signature-pad"></canvas>
             <div class="button-container">
@@ -107,11 +119,14 @@
             doc.text("Confirmation de Check-in", 10, 10);
             doc.text("Nom: " + document.getElementById('nom').value, 10, 20);
             doc.text("Email: " + document.getElementById('email').value, 10, 30);
-            doc.text("Date d’entrée: " + document.getElementById('date_entree').value, 10, 40);
-            doc.text("Date de départ: " + document.getElementById('date_depart').value, 10, 50);
+            doc.text("Nombre d'occupants: " + document.getElementById('nombre_occupants').value, 10, 40);
+            doc.text("Date d’entrée: " + document.getElementById('date_entree').value, 10, 50);
+            doc.text("Date de départ: " + document.getElementById('date_depart').value, 10, 60);
+            doc.text("Commentaire: " + document.getElementById('commentaire').value, 10, 70);
+            doc.text("Date de signature: " + document.getElementById('date_signature').value, 10, 80);
             let canvas = document.getElementById('signature-pad');
             let imgData = canvas.toDataURL("image/png");
-            doc.addImage(imgData, 'PNG', 10, 60, 50, 20);
+            doc.addImage(imgData, 'PNG', 10, 90, 50, 20);
             let pdfData = doc.output("datauristring");
             sendEmail(pdfData);
         }
@@ -122,6 +137,8 @@
                 email: document.getElementById('email').value,
                 date_entree: document.getElementById('date_entree').value,
                 date_depart: document.getElementById('date_depart').value,
+                commentaire: document.getElementById('commentaire').value,
+                date_signature: document.getElementById('date_signature').value,
                 pdf_attachment: pdfData
             }).then(function(response) {
                 alert("Email envoyé avec succès!");
