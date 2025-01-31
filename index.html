@@ -137,15 +137,15 @@
             event.preventDefault();
             drawing = true;
             ctx.beginPath();
-            ctx.moveTo(event.clientX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
-                       event.clientY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
+            ctx.moveTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
+                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
         }
 
         function draw(event) {
             event.preventDefault();
             if (!drawing) return;
-            ctx.lineTo(event.clientX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
-                       event.clientY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
+            ctx.lineTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
+                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
             ctx.stroke();
         }
 
@@ -163,6 +163,12 @@
         function clearSignature() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
+
+        document.getElementById('checkin-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('thank-you-message').classList.remove('hidden');
+        });
     </script>
 </body>
 </html>
