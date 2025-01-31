@@ -129,17 +129,52 @@
     </div>
 
     <script>
+        let canvas = document.getElementById('signature-pad');
+        let ctx = canvas.getContext('2d');
+        let drawing = false;
+        
+        function getPosition(event) {
+            let rect = canvas.getBoundingClientRect();
+            return {
+                x: event.clientX || event.touches[0].clientX - rect.left,
+                y: event.clientY || event.touches[0].clientY - rect.top
+            };
+        }
+
+        function startDrawing(event) {
+            event.preventDefault();
+            drawing = true;
+            let pos = getPosition(event);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function draw(event) {
+            event.preventDefault();
+            if (!drawing) return;
+            let pos = getPosition(event);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            drawing = false;
+        }
+
+        canvas.addEventListener('pointerdown', startDrawing);
+        canvas.addEventListener('pointermove', draw);
+        canvas.addEventListener('pointerup', stopDrawing);
+        canvas.addEventListener('pointerleave', stopDrawing);
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
         document.getElementById('checkin-form').addEventListener('submit', function(event) {
             event.preventDefault();
             document.getElementById('form-container').style.display = 'none';
             document.getElementById('thank-you-message').classList.remove('hidden');
         });
-
-        function clearSignature() {
-            let canvas = document.getElementById('signature-pad');
-            let ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
     </script>
 </body>
 </html>
