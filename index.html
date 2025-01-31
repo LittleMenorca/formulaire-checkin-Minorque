@@ -78,10 +78,10 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="form-container">
         <h2>Bienvenue à la maison</h2>
         <p>Merci de compléter ce formulaire pour confirmer votre check-in.</p>
-        <form>
+        <form id="checkin-form">
             <label for="nom">Nom complet :</label>
             <input type="text" id="nom" name="nom" required>
 
@@ -118,46 +118,22 @@
         </form>
         <p class="notice">Vous disposez d'un délai max de 24h pour nous faire remonter tout dysfonctionnement à la maison. Nous agirons dans les plus brefs délais. Passé ce délai, nous considérons que la maison est conforme à vos attentes.</p>
     </div>
+    
+    <div class="container" id="thank-you-message" style="display: none;">
+        <h2>Merci pour votre validation</h2>
+        <p>Nous vous remercions pour cette validation et nous vous souhaitons de passer d'excellentes vacances. Nous restons à votre disposition sur WhatsApp pour tous besoins.</p>
+    </div>
 
     <script>
-        let canvas = document.getElementById('signature-pad');
-        let ctx = canvas.getContext('2d');
-        let drawing = false;
-
-        function getPosition(event) {
-            let rect = canvas.getBoundingClientRect();
-            return {
-                x: event.clientX || event.touches[0].clientX - rect.left,
-                y: event.clientY || event.touches[0].clientY - rect.top
-            };
-        }
-
-        function startDrawing(event) {
+        document.getElementById('checkin-form').addEventListener('submit', function(event) {
             event.preventDefault();
-            drawing = true;
-            let pos = getPosition(event);
-            ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
-        }
-
-        function draw(event) {
-            event.preventDefault();
-            if (!drawing) return;
-            let pos = getPosition(event);
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
-        }
-
-        function stopDrawing() {
-            drawing = false;
-        }
-
-        canvas.addEventListener('pointerdown', startDrawing);
-        canvas.addEventListener('pointermove', draw);
-        canvas.addEventListener('pointerup', stopDrawing);
-        canvas.addEventListener('pointerleave', stopDrawing);
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('thank-you-message').style.display = 'block';
+        });
 
         function clearSignature() {
+            let canvas = document.getElementById('signature-pad');
+            let ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     </script>
