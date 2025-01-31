@@ -133,27 +133,19 @@
         let ctx = canvas.getContext('2d');
         let drawing = false;
         
-        function getPosition(event) {
-            let rect = canvas.getBoundingClientRect();
-            return {
-                x: event.clientX || event.touches[0].clientX - rect.left,
-                y: event.clientY || event.touches[0].clientY - rect.top
-            };
-        }
-
         function startDrawing(event) {
             event.preventDefault();
             drawing = true;
-            let pos = getPosition(event);
             ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
+            ctx.moveTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
+                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
         }
 
         function draw(event) {
             event.preventDefault();
             if (!drawing) return;
-            let pos = getPosition(event);
-            ctx.lineTo(pos.x, pos.y);
+            ctx.lineTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
+                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
             ctx.stroke();
         }
 
@@ -161,20 +153,17 @@
             drawing = false;
         }
 
-        canvas.addEventListener('pointerdown', startDrawing);
-        canvas.addEventListener('pointermove', draw);
-        canvas.addEventListener('pointerup', stopDrawing);
-        canvas.addEventListener('pointerleave', stopDrawing);
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseleave', stopDrawing);
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
 
         function clearSignature() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
-
-        document.getElementById('checkin-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            document.getElementById('form-container').style.display = 'none';
-            document.getElementById('thank-you-message').classList.remove('hidden');
-        });
     </script>
 </body>
 </html>
