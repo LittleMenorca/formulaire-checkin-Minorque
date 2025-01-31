@@ -133,7 +133,7 @@
         document.getElementById('checkin-form').addEventListener('submit', function(event) {
             let emailField = document.getElementById('email');
             let emailError = document.getElementById('email-error');
-            let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
             
             if (!emailPattern.test(emailField.value)) {
                 emailError.style.display = 'block';
