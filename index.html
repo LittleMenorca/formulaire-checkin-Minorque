@@ -132,20 +132,20 @@
         let canvas = document.getElementById('signature-pad');
         let ctx = canvas.getContext('2d');
         let drawing = false;
-        
+
         function startDrawing(event) {
             event.preventDefault();
             drawing = true;
             ctx.beginPath();
-            ctx.moveTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
-                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
+            ctx.moveTo(event.clientX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
+                       event.clientY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
         }
 
         function draw(event) {
             event.preventDefault();
             if (!drawing) return;
-            ctx.lineTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
-                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
+            ctx.lineTo(event.clientX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
+                       event.clientY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
             ctx.stroke();
         }
 
@@ -156,7 +156,6 @@
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseleave', stopDrawing);
         canvas.addEventListener('touchstart', startDrawing);
         canvas.addEventListener('touchmove', draw);
         canvas.addEventListener('touchend', stopDrawing);
