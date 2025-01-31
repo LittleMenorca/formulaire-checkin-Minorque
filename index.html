@@ -68,6 +68,7 @@
             height: 150px;
             background-color: #e0e0e0;
             touch-action: none;
+            display: block;
         }
         .notice {
             font-size: 12px;
@@ -122,55 +123,40 @@
         let canvas = document.getElementById('signature-pad');
         let ctx = canvas.getContext('2d');
         let drawing = false;
-        
+
         function getPosition(event) {
             let rect = canvas.getBoundingClientRect();
             return {
-                x: event.clientX - rect.left,
-                y: event.clientY - rect.top
+                x: event.clientX || event.touches[0].clientX - rect.left,
+                y: event.clientY || event.touches[0].clientY - rect.top
             };
         }
-        
-        canvas.addEventListener('mousedown', function(e) {
+
+        function startDrawing(event) {
+            event.preventDefault();
             drawing = true;
-            let pos = getPosition(e);
+            let pos = getPosition(event);
             ctx.beginPath();
             ctx.moveTo(pos.x, pos.y);
-        });
-        
-        canvas.addEventListener('mousemove', function(e) {
+        }
+
+        function draw(event) {
+            event.preventDefault();
             if (!drawing) return;
-            let pos = getPosition(e);
+            let pos = getPosition(event);
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
-        });
-        
-        canvas.addEventListener('mouseup', function() {
+        }
+
+        function stopDrawing() {
             drawing = false;
-        });
-        
-        canvas.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            drawing = true;
-            let touch = e.touches[0];
-            let rect = canvas.getBoundingClientRect();
-            ctx.beginPath();
-            ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
-        });
-        
-        canvas.addEventListener('touchmove', function(e) {
-            e.preventDefault();
-            if (!drawing) return;
-            let touch = e.touches[0];
-            let rect = canvas.getBoundingClientRect();
-            ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-            ctx.stroke();
-        });
-        
-        canvas.addEventListener('touchend', function() {
-            drawing = false;
-        });
-        
+        }
+
+        canvas.addEventListener('pointerdown', startDrawing);
+        canvas.addEventListener('pointermove', draw);
+        canvas.addEventListener('pointerup', stopDrawing);
+        canvas.addEventListener('pointerleave', stopDrawing);
+
         function clearSignature() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
