@@ -18,6 +18,7 @@
             border: 1px solid #ccc;
             border-radius: 10px;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
         label {
             font-weight: bold;
@@ -75,6 +76,9 @@
             color: #666;
             margin-top: 15px;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -119,7 +123,7 @@
         <p class="notice">Vous disposez d'un délai max de 24h pour nous faire remonter tout dysfonctionnement à la maison. Nous agirons dans les plus brefs délais. Passé ce délai, nous considérons que la maison est conforme à vos attentes.</p>
     </div>
     
-    <div class="container" id="thank-you-message" style="display: none;">
+    <div class="container hidden" id="thank-you-message">
         <h2>Merci pour votre validation</h2>
         <p>Nous vous remercions pour cette validation et nous vous souhaitons de passer d'excellentes vacances. Nous restons à votre disposition sur WhatsApp pour tous besoins.</p>
     </div>
@@ -128,7 +132,7 @@
         document.getElementById('checkin-form').addEventListener('submit', function(event) {
             event.preventDefault();
             document.getElementById('form-container').style.display = 'none';
-            document.getElementById('thank-you-message').style.display = 'block';
+            document.getElementById('thank-you-message').classList.remove('hidden');
         });
 
         function clearSignature() {
