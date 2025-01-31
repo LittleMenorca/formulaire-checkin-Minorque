@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenue à la maison</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f1f1;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input, textarea {
+            width: 100%;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            background-color: #e0e0e0;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        .clear-button {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 48%;
+        }
+        .clear-button:hover {
+            background-color: #c82333;
+        }
+        .submit-button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 48%;
+        }
+        .submit-button:hover {
+            background-color: #218838;
+        }
+        canvas {
+            border: 1px solid #bbb;
+            width: 100%;
+            height: 150px;
+            background-color: #e0e0e0;
+        }
+        .notice {
+            font-size: 12px;
+            color: #666;
+            margin-top: 15px;
+        }
+    </style>
+    <script>
+        function setLanguage() {
+            let userLang = navigator.language || navigator.userLanguage;
+            document.documentElement.lang = userLang;
+        }
+        function validateEmail() {
+            let emailInput = document.getElementById('email');
+            let emailValue = emailInput.value;
+            let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(emailValue)) {
+                alert("Veuillez entrer une adresse email valide.");
+                emailInput.focus();
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body onload="setLanguage()">
+    <div class="container">
+        <h2>Bienvenue à la maison</h2>
+        <p>Merci de compléter ce formulaire pour confirmer votre check-in.</p>
+        <form onsubmit="return validateEmail()">
+            <label for="nom">Nom complet :</label>
+            <input type="text" id="nom" name="nom" required>
+
+            <label for="email">Email :</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="nombre_occupants">Nombre d'occupants :</label>
+            <input type="number" id="nombre_occupants" name="nombre_occupants" min="1" required>
+
+            <label for="date_entree">Date d’entrée :</label>
+            <input type="date" id="date_entree" name="date_entree" required>
+            <script>
+                document.getElementById('date_entree').valueAsDate = new Date();
+            </script>
+
+            <label for="date_depart">Date de départ :</label>
+            <input type="date" id="date_depart" name="date_depart" required>
+
+            <label for="commentaire">Commentaire :</label>
+            <textarea id="commentaire" name="commentaire"></textarea>
+
+            <label for="date_signature">Date de signature :</label>
+            <input type="date" id="date_signature" name="date_signature" readonly>
+            <script>
+                document.getElementById('date_signature').valueAsDate = new Date();
+            </script>
+
+            <label>Signature :</label>
+            <canvas id="signature-pad"></canvas>
+            <div class="button-container">
+                <button type="button" class="clear-button" onclick="clearSignature()">Effacer</button>
+                <button type="submit" class="submit-button">Soumettre</button>
+            </div>
+        </form>
+        <p class="notice">Vous disposez d'un délai max de 24h pour nous faire remonter tout dysfonctionnement à la maison. Nous agirons dans les plus brefs délais. Passé ce délai, nous considérons que la maison est conforme à vos attentes.</p>
+    </div>
+
+    <script>
+        let canvas = document.getElementById('signature-pad');
+        let ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        canvas.addEventListener('mousedown', function(e) {
+            drawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+            if (drawing) {
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            }
+        });
+
+        canvas.addEventListener('mouseup', function() {
+            drawing = false;
+        });
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    </script>
+</body>
+</html>
