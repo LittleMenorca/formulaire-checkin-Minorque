@@ -129,42 +129,17 @@
         </form>
     </div>
     
+    <div class="container hidden" id="thank-you-message">
+        <h2>Merci pour votre validation</h2>
+        <p>Nous vous remercions pour cette validation et nous vous souhaitons de passer d'excellentes vacances. Nous restons à votre disposition sur WhatsApp pour tous besoins.</p>
+    </div>
+
     <script>
-        let canvas = document.getElementById('signature-pad');
-        let ctx = canvas.getContext('2d');
-        let drawing = false;
-        
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseleave', stopDrawing);
-        canvas.addEventListener('touchstart', startDrawing);
-        canvas.addEventListener('touchmove', draw);
-        canvas.addEventListener('touchend', stopDrawing);
-        
-        function startDrawing(event) {
-            drawing = true;
-            ctx.beginPath();
-            ctx.moveTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
-                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
-            document.querySelector('.signature-placeholder').style.display = 'none';
-        }
-
-        function draw(event) {
-            if (!drawing) return;
-            ctx.lineTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
-                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
-            ctx.stroke();
-        }
-
-        function stopDrawing() {
-            drawing = false;
-        }
-
-        function clearSignature() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            document.querySelector('.signature-placeholder').style.display = 'block';
-        }
+        document.getElementById('checkin-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('form-container').classList.add('hidden');
+            document.getElementById('thank-you-message').classList.remove('hidden');
+        });
     </script>
 </body>
 </html>
