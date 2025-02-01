@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
     <script>
         (function(){
-            emailjs.init("chauvin"); // Remplacez par votre User ID EmailJS
+            emailjs.init("chauvin");
         })();
     </script>
     <style>
@@ -122,32 +122,29 @@
             doc.text("Commentaire: " + document.getElementById('commentaire').value, 10, 60);
             doc.text("Date de signature: " + document.getElementById('date_signature').value, 10, 70);
             let canvas = document.getElementById('signature-pad');
+            let ctx = canvas.getContext('2d');
+            let drawing = false;
+
+            canvas.addEventListener('mousedown', (e) => {
+                drawing = true;
+                ctx.beginPath();
+                ctx.moveTo(e.offsetX, e.offsetY);
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (!drawing) return;
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            });
+
+            canvas.addEventListener('mouseup', () => {
+                drawing = false;
+            });
+            
             let imgData = canvas.toDataURL("image/png");
             doc.addImage(imgData, 'PNG', 10, 80, 50, 20);
             let pdfData = doc.output("datauristring");
             sendEmail(pdfData);
-        }
-        
-        function sendEmail(pdfData) {
-            emailjs.send("service_l3ldvzh", "template_kvmrixn", {
-                nom: document.getElementById('nom').value,
-                email: document.getElementById('email').value,
-                date_entree: document.getElementById('date_entree').value,
-                date_depart: document.getElementById('date_depart').value,
-                commentaire: document.getElementById('commentaire').value,
-                date_signature: document.getElementById('date_signature').value,
-                pdf_attachment: pdfData
-            }).then(function(response) {
-                alert("Email envoyé avec succès!");
-            }, function(error) {
-                alert("Erreur lors de l'envoi: " + error.text);
-            });
-        }
-        
-        function clearSignature() {
-            let canvas = document.getElementById('signature-pad');
-            let ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     </script>
 </body>
