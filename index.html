@@ -151,10 +151,12 @@
             let emailError = document.getElementById('email-error');
             let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
             
-            if (!emailPattern.test(emailField.value)) {
+            if (!emailPattern.test(emailField.value.trim())) {
                 emailError.style.display = 'block';
+                emailField.style.border = '2px solid red';
             } else {
                 emailError.style.display = 'none';
+                emailField.style.border = '2px solid green';
             }
         });
     </script>
