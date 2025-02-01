@@ -77,6 +77,9 @@
             font-size: 12px;
             display: none;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -111,23 +114,13 @@
             </div>
         </form>
     </div>
+
+    <div class="container hidden" id="thank-you-message">
+        <h2>Merci pour votre validation</h2>
+        <p>Nous vous remercions pour cette validation et nous vous souhaitons de passer d'excellentes vacances. Nous restons à votre disposition sur WhatsApp pour tous besoins.</p>
+    </div>
+    
     <script>
-        let emailField = document.getElementById('email');
-        let emailError = document.getElementById('email-error');
-        let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-        emailField.addEventListener('blur', function() {
-            if (!emailPattern.test(emailField.value.trim())) {
-                emailError.style.display = 'block';
-                emailField.style.border = '2px solid red';
-                emailField.setCustomValidity("Veuillez entrer une adresse email valide.");
-            } else {
-                emailError.style.display = 'none';
-                emailField.style.border = '2px solid green';
-                emailField.setCustomValidity("");
-            }
-        });
-
         document.getElementById('checkin-form').addEventListener('submit', function(event) {
             event.preventDefault();
             generatePDF();
@@ -150,6 +143,8 @@
                 email: document.getElementById('email').value,
                 pdf_attachment: pdfData
             }).then(function(response) {
+                document.getElementById('form-container').classList.add('hidden');
+                document.getElementById('thank-you-message').classList.remove('hidden');
                 alert("Email envoyé avec succès!");
             }, function(error) {
                 alert("Erreur lors de l'envoi: " + error.text);
