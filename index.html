@@ -112,45 +112,11 @@
         </form>
     </div>
     <script>
-        let canvas = document.getElementById('signature-pad');
-        let ctx = canvas.getContext('2d');
-        let drawing = false;
+        let emailField = document.getElementById('email');
+        let emailError = document.getElementById('email-error');
+        let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-        function startDrawing(event) {
-            drawing = true;
-            ctx.beginPath();
-            ctx.moveTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
-                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
-        }
-
-        function draw(event) {
-            if (!drawing) return;
-            ctx.lineTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
-                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
-            ctx.stroke();
-        }
-
-        function stopDrawing() {
-            drawing = false;
-        }
-
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseleave', stopDrawing);
-        canvas.addEventListener('touchstart', startDrawing);
-        canvas.addEventListener('touchmove', draw);
-        canvas.addEventListener('touchend', stopDrawing);
-
-        function clearSignature() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        document.getElementById('email').addEventListener('input', function() {
-            let emailField = document.getElementById('email');
-            let emailError = document.getElementById('email-error');
-            let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            
+        emailField.addEventListener('blur', function() {
             if (!emailPattern.test(emailField.value.trim())) {
                 emailError.style.display = 'block';
                 emailField.style.border = '2px solid red';
@@ -161,6 +127,34 @@
                 emailField.setCustomValidity("");
             }
         });
+
+        document.getElementById('checkin-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            generatePDF();
+        });
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            let doc = new jsPDF();
+            doc.text("Confirmation de Check-in", 10, 10);
+            doc.text("Nom: " + document.getElementById('nom').value, 10, 20);
+            doc.text("Email: " + document.getElementById('email').value, 10, 30);
+            doc.text("Date d’entrée: " + document.getElementById('date_entree').value, 10, 40);
+            doc.text("Date de départ: " + document.getElementById('date_depart').value, 10, 50);
+            let pdfData = doc.output("datauristring");
+            sendEmail(pdfData);
+        }
+
+        function sendEmail(pdfData) {
+            emailjs.send("VOTRE_SERVICE_ID", "VOTRE_TEMPLATE_ID", {
+                email: document.getElementById('email').value,
+                pdf_attachment: pdfData
+            }).then(function(response) {
+                alert("Email envoyé avec succès!");
+            }, function(error) {
+                alert("Erreur lors de l'envoi: " + error.text);
+            });
+        }
     </script>
 </body>
 </html>
