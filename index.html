@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienvenue à la maison</title>
     <script>
-        const GOOGLE_SHEET_URL = "VOTRE_WEBHOOK_URL"; // Remplacez par l'URL de votre Apps Script déployé
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyQ-2lseP073CGrhFMN4MYlITHpCUNNy2lGfaAchwbqaxPqqsUOPLwj4eGWlzbawTRu/exec";
     </script>
     <style>
         body {
@@ -60,6 +60,19 @@
             cursor: pointer;
             width: 48%;
         }
+        canvas {
+            border: 1px solid #bbb;
+            width: 100%;
+            height: 150px;
+            background-color: #e0e0e0;
+            touch-action: none;
+            display: block;
+        }
+        #email-error {
+            color: red;
+            font-size: 12px;
+            display: none;
+        }
         .hidden {
             display: none;
         }
@@ -74,6 +87,7 @@
             <input type="text" id="nom" name="nom" required>
             <label for="email">Email :</label>
             <input type="email" id="email" name="email" required>
+            <span id="email-error">Veuillez entrer une adresse email valide.</span>
             <label for="nombre_occupants">Nombre d'occupants :</label>
             <input type="number" id="nombre_occupants" name="nombre_occupants" min="1" required>
             <label for="date_entree">Date d’entrée :</label>
@@ -99,41 +113,27 @@
         </form>
     </div>
 
-    <div class="container hidden" id="thank-you-message">
-        <h2>Merci pour votre validation</h2>
-        <p>Nous vous remercions pour cette validation et nous vous souhaitons de passer d'excellentes vacances. Nous restons à votre disposition sur WhatsApp pour tous besoins.</p>
-    </div>
-    
     <script>
-        document.getElementById('checkin-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            sendToGoogleSheets();
+        document.getElementById('email').addEventListener('blur', function() {
+            let emailField = document.getElementById('email');
+            let emailError = document.getElementById('email-error');
+            let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            
+            if (!emailPattern.test(emailField.value.trim())) {
+                emailError.style.display = 'block';
+                emailField.style.border = '2px solid red';
+                emailField.setCustomValidity("Veuillez entrer une adresse email valide.");
+            } else {
+                emailError.style.display = 'none';
+                emailField.style.border = '2px solid green';
+                emailField.setCustomValidity("");
+            }
         });
 
-        function sendToGoogleSheets() {
-            const formData = {
-                nom: document.getElementById('nom').value,
-                email: document.getElementById('email').value,
-                nombre_occupants: document.getElementById('nombre_occupants').value,
-                date_entree: document.getElementById('date_entree').value,
-                date_depart: document.getElementById('date_depart').value,
-                commentaire: document.getElementById('commentaire').value,
-                date_signature: document.getElementById('date_signature').value,
-                signature: document.getElementById('signature-pad').toDataURL()
-            };
-            fetch(GOOGLE_SHEET_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(formData)
-            }).then(() => {
-                document.getElementById('form-container').classList.add('hidden');
-                document.getElementById('thank-you-message').classList.remove('hidden');
-            }).catch(error => {
-                alert("Erreur d'envoi des données : " + error);
-            });
+        function clearSignature() {
+            let canvas = document.getElementById('signature-pad');
+            let ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     </script>
 </body>
