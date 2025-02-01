@@ -145,6 +145,33 @@
                 emailField.setCustomValidity("");
             }
         });
+        
+        let canvas = document.getElementById('signature-pad');
+        let ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        canvas.addEventListener('pointerdown', (e) => {
+            drawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+            document.querySelector('.signature-placeholder').style.display = 'none';
+        });
+        canvas.addEventListener('pointermove', (e) => {
+            if (!drawing) return;
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        });
+        canvas.addEventListener('pointerup', () => {
+            drawing = false;
+        });
+        canvas.addEventListener('pointerleave', () => {
+            drawing = false;
+        });
+        
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.querySelector('.signature-placeholder').style.display = 'block';
+        }
     </script>
 </body>
 </html>
