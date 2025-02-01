@@ -114,7 +114,7 @@
     </div>
 
     <script>
-        document.getElementById('email').addEventListener('blur', function() {
+        document.getElementById('email').addEventListener('input', function() {
             let emailField = document.getElementById('email');
             let emailError = document.getElementById('email-error');
             let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -122,11 +122,9 @@
             if (!emailPattern.test(emailField.value.trim())) {
                 emailError.style.display = 'block';
                 emailField.style.border = '2px solid red';
-                emailField.setCustomValidity("Veuillez entrer une adresse email valide.");
             } else {
                 emailError.style.display = 'none';
                 emailField.style.border = '2px solid green';
-                emailField.setCustomValidity("");
             }
         });
         
@@ -134,17 +132,17 @@
         let ctx = canvas.getContext('2d');
         let drawing = false;
 
-        canvas.addEventListener('mousedown', (e) => {
+        canvas.addEventListener('pointerdown', (e) => {
             drawing = true;
             ctx.beginPath();
             ctx.moveTo(e.offsetX, e.offsetY);
         });
-        canvas.addEventListener('mousemove', (e) => {
+        canvas.addEventListener('pointermove', (e) => {
             if (!drawing) return;
             ctx.lineTo(e.offsetX, e.offsetY);
             ctx.stroke();
         });
-        canvas.addEventListener('mouseup', () => {
+        canvas.addEventListener('pointerup', () => {
             drawing = false;
         });
         
