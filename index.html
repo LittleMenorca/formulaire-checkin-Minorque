@@ -80,7 +80,7 @@
             color: rgba(0, 0, 0, 0.3);
             pointer-events: none;
         }
-        #email-error {
+        #email-error, #signature-error {
             color: red;
             font-size: 12px;
             display: none;
@@ -121,6 +121,7 @@
                 <canvas id="signature-pad"></canvas>
                 <div class="signature-placeholder">Merci d'apposer votre signature manuscrite ici</div>
             </div>
+            <span id="signature-error">Veuillez signer avant de soumettre.</span>
             <div class="button-container">
                 <button type="button" class="clear-button" onclick="clearSignature()">Effacer</button>
                 <button type="submit" class="submit-button">Soumettre</button>
@@ -135,7 +136,11 @@
 
     <script>
         document.getElementById('checkin-form').addEventListener('submit', function(event) {
-            event.preventDefault();
+            if (isSignatureEmpty()) {
+                event.preventDefault();
+                document.getElementById('signature-error').style.display = 'block';
+                return;
+            }
             document.getElementById('form-container').classList.add('hidden');
             document.getElementById('thank-you-message').classList.remove('hidden');
         });
@@ -144,6 +149,11 @@
         let ctx = canvas.getContext('2d');
         let drawing = false;
         let placeholder = document.querySelector('.signature-placeholder');
+        
+        function isSignatureEmpty() {
+            let empty = ctx.getImageData(0, 0, canvas.width, canvas.height).data.every(pixel => pixel === 0);
+            return empty;
+        }
         
         canvas.addEventListener('pointerdown', (e) => {
             drawing = true;
@@ -159,13 +169,11 @@
         canvas.addEventListener('pointerup', () => {
             drawing = false;
         });
-        canvas.addEventListener('pointerleave', () => {
-            drawing = false;
-        });
         
         function clearSignature() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             placeholder.style.display = 'block';
+            document.getElementById('signature-error').style.display = 'none';
         }
     </script>
 </body>
