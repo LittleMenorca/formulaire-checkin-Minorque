@@ -154,9 +154,11 @@
             if (!emailPattern.test(emailField.value.trim())) {
                 emailError.style.display = 'block';
                 emailField.style.border = '2px solid red';
+                emailField.setCustomValidity("Veuillez entrer une adresse email valide.");
             } else {
                 emailError.style.display = 'none';
                 emailField.style.border = '2px solid green';
+                emailField.setCustomValidity("");
             }
         });
     </script>
