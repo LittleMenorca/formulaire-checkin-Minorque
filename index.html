@@ -106,45 +106,45 @@
         </form>
     </div>
     <script>
-        document.getElementById('checkin-form').addEventListener('submit', function(event) {
+        let canvas = document.getElementById('signature-pad');
+        let ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        function getPosition(event) {
+            let rect = canvas.getBoundingClientRect();
+            return {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top
+            };
+        }
+
+        function startDrawing(event) {
             event.preventDefault();
-            generatePDF();
-        });
-        
-        function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            let doc = new jsPDF();
-            doc.text("Confirmation de Check-in", 10, 10);
-            doc.text("Nom: " + document.getElementById('nom').value, 10, 20);
-            doc.text("Email: " + document.getElementById('email').value, 10, 30);
-            doc.text("Date d’entrée: " + document.getElementById('date_entree').value, 10, 40);
-            doc.text("Date de départ: " + document.getElementById('date_depart').value, 10, 50);
-            doc.text("Commentaire: " + document.getElementById('commentaire').value, 10, 60);
-            doc.text("Date de signature: " + document.getElementById('date_signature').value, 10, 70);
-            let canvas = document.getElementById('signature-pad');
-            let ctx = canvas.getContext('2d');
-            let drawing = false;
+            drawing = true;
+            let pos = getPosition(event);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
 
-            canvas.addEventListener('mousedown', (e) => {
-                drawing = true;
-                ctx.beginPath();
-                ctx.moveTo(e.offsetX, e.offsetY);
-            });
+        function draw(event) {
+            event.preventDefault();
+            if (!drawing) return;
+            let pos = getPosition(event);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
 
-            canvas.addEventListener('mousemove', (e) => {
-                if (!drawing) return;
-                ctx.lineTo(e.offsetX, e.offsetY);
-                ctx.stroke();
-            });
+        function stopDrawing() {
+            drawing = false;
+        }
 
-            canvas.addEventListener('mouseup', () => {
-                drawing = false;
-            });
-            
-            let imgData = canvas.toDataURL("image/png");
-            doc.addImage(imgData, 'PNG', 10, 80, 50, 20);
-            let pdfData = doc.output("datauristring");
-            sendEmail(pdfData);
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseleave', stopDrawing);
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     </script>
 </body>
