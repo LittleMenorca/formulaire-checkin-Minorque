@@ -130,44 +130,37 @@
     </div>
     
     <script>
-        document.getElementById('email').addEventListener('input', function() {
-            let emailField = document.getElementById('email');
-            let emailError = document.getElementById('email-error');
-            let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            
-            if (!emailPattern.test(emailField.value.trim())) {
-                emailError.style.display = 'block';
-                emailField.style.border = '2px solid red';
-                emailField.setCustomValidity("Veuillez entrer une adresse email valide.");
-            } else {
-                emailError.style.display = 'none';
-                emailField.style.border = '2px solid green';
-                emailField.setCustomValidity("");
-            }
-        });
-        
         let canvas = document.getElementById('signature-pad');
         let ctx = canvas.getContext('2d');
         let drawing = false;
-
-        canvas.addEventListener('pointerdown', (e) => {
+        
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseleave', stopDrawing);
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
+        
+        function startDrawing(event) {
             drawing = true;
             ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
+            ctx.moveTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
+                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
             document.querySelector('.signature-placeholder').style.display = 'none';
-        });
-        canvas.addEventListener('pointermove', (e) => {
+        }
+
+        function draw(event) {
             if (!drawing) return;
-            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.lineTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
+                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
             ctx.stroke();
-        });
-        canvas.addEventListener('pointerup', () => {
+        }
+
+        function stopDrawing() {
             drawing = false;
-        });
-        canvas.addEventListener('pointerleave', () => {
-            drawing = false;
-        });
-        
+        }
+
         function clearSignature() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             document.querySelector('.signature-placeholder').style.display = 'block';
