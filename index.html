@@ -72,6 +72,11 @@
             touch-action: none;
             display: block;
         }
+        #email-error {
+            color: red;
+            font-size: 12px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -83,6 +88,7 @@
             <input type="text" id="nom" name="nom" required>
             <label for="email">Email :</label>
             <input type="email" id="email" name="email" required>
+            <span id="email-error">Veuillez entrer une adresse email valide.</span>
             <label for="date_entree">Date d’entrée :</label>
             <input type="date" id="date_entree" name="date_entree" required>
             <script>
@@ -110,27 +116,17 @@
         let ctx = canvas.getContext('2d');
         let drawing = false;
 
-        function getPosition(event) {
-            let rect = canvas.getBoundingClientRect();
-            return {
-                x: event.clientX - rect.left,
-                y: event.clientY - rect.top
-            };
-        }
-
         function startDrawing(event) {
-            event.preventDefault();
             drawing = true;
-            let pos = getPosition(event);
             ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
+            ctx.moveTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
+                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
         }
 
         function draw(event) {
-            event.preventDefault();
             if (!drawing) return;
-            let pos = getPosition(event);
-            ctx.lineTo(pos.x, pos.y);
+            ctx.lineTo(event.offsetX || event.touches[0].clientX - canvas.getBoundingClientRect().left, 
+                       event.offsetY || event.touches[0].clientY - canvas.getBoundingClientRect().top);
             ctx.stroke();
         }
 
@@ -142,10 +138,25 @@
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mouseleave', stopDrawing);
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
 
         function clearSignature() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
+
+        document.getElementById('email').addEventListener('input', function() {
+            let emailField = document.getElementById('email');
+            let emailError = document.getElementById('email-error');
+            let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            
+            if (!emailPattern.test(emailField.value)) {
+                emailError.style.display = 'block';
+            } else {
+                emailError.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
