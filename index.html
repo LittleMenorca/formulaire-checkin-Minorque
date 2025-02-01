@@ -60,6 +60,9 @@
             cursor: pointer;
             width: 48%;
         }
+        .signature-container {
+            position: relative;
+        }
         canvas {
             border: 1px solid #bbb;
             width: 100%;
@@ -67,6 +70,15 @@
             background-color: #e0e0e0;
             touch-action: none;
             display: block;
+        }
+        .signature-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.3);
+            pointer-events: none;
         }
         #email-error {
             color: red;
@@ -105,37 +117,39 @@
                 document.getElementById('date_signature').valueAsDate = new Date();
             </script>
             <label>Signature :</label>
-            <canvas id="signature-pad"></canvas>
+            <div class="signature-container">
+                <canvas id="signature-pad"></canvas>
+                <div class="signature-placeholder">Merci d'apposer votre signature manuscrite ici</div>
+            </div>
             <div class="button-container">
                 <button type="button" class="clear-button" onclick="clearSignature()">Effacer</button>
                 <button type="submit" class="submit-button">Soumettre</button>
             </div>
         </form>
     </div>
+    
+    <div class="container hidden" id="thank-you-message">
+        <h2>Merci pour votre validation</h2>
+        <p>Nous vous remercions pour cette validation et nous vous souhaitons de passer d'excellentes vacances. Nous restons à votre disposition sur WhatsApp pour tous besoins.</p>
+    </div>
 
     <script>
-        document.getElementById('email').addEventListener('input', function() {
-            let emailField = document.getElementById('email');
-            let emailError = document.getElementById('email-error');
-            let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            
-            if (!emailPattern.test(emailField.value.trim())) {
-                emailError.style.display = 'block';
-                emailField.style.border = '2px solid red';
-            } else {
-                emailError.style.display = 'none';
-                emailField.style.border = '2px solid green';
-            }
+        document.getElementById('checkin-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('form-container').classList.add('hidden');
+            document.getElementById('thank-you-message').classList.remove('hidden');
         });
         
         let canvas = document.getElementById('signature-pad');
         let ctx = canvas.getContext('2d');
         let drawing = false;
-
+        let placeholder = document.querySelector('.signature-placeholder');
+        
         canvas.addEventListener('pointerdown', (e) => {
             drawing = true;
             ctx.beginPath();
             ctx.moveTo(e.offsetX, e.offsetY);
+            placeholder.style.display = 'none';
         });
         canvas.addEventListener('pointermove', (e) => {
             if (!drawing) return;
@@ -151,6 +165,7 @@
         
         function clearSignature() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            placeholder.style.display = 'block';
         }
     </script>
 </body>
